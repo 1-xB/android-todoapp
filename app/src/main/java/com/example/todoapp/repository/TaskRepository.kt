@@ -21,4 +21,8 @@ class TaskRepository(context: Context) {
     suspend fun addTask(task: Task) {
         taskDao.insertTask(task)
     }
+
+    suspend fun updateTaskCompletion(taskId: Int, isCompleted: Boolean) {
+        taskDao.updateTaskCompletion(taskId, isCompleted)
+    }
 }
