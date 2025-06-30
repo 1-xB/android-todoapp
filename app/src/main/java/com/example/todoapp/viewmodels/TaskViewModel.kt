@@ -8,11 +8,7 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
 
     suspend fun getAllTasks() = repository.getAllTasks()
 
-    suspend fun addTask(task: Task = Task(
-        title = "New Task",
-        description = null,
-        isCompleted = false,
-    )) {
+    suspend fun addTask(task: Task) {
         repository.addTask(task)
     }
 
