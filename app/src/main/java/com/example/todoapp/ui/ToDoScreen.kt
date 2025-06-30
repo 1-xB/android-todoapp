@@ -10,10 +10,14 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
@@ -50,6 +54,8 @@ fun ToDoScreen(
     var isExpandedCompleted by remember { mutableStateOf(false) }
 
     var isAddTaskDialogOpen by remember { mutableStateOf(false) }
+
+    var taskToDelete by remember { mutableStateOf<Task?>(null) }
 
     LaunchedEffect(Unit) { // Uruchomi się przy pierwszym renderowaniu
         tasks = refreshTasks(taskViewModel = taskViewModel)
@@ -215,6 +221,29 @@ fun ToDoScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                 }
+
+                                Spacer(modifier = Modifier.weight(1f))
+
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.End,
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    IconButton(
+                                        onClick = {
+                                            taskToDelete = task
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = "delete task",
+                                            tint = MaterialTheme.colorScheme.error
+                                        )
+                                    }
+
+                                }
+
+
                             }
                         }
                     }
@@ -233,6 +262,21 @@ fun ToDoScreen(
                     taskViewModel.addTask(newTask)
                     tasks = refreshTasks(taskViewModel = taskViewModel)
                     isAddTaskDialogOpen = false
+                }
+            }
+        )
+    }
+
+    if (taskToDelete != null) {
+        ShowDeleteConfirmationDialog(
+            onDismiss = {
+                taskToDelete = null
+            },
+            onConfirmDelete = {
+                coroutineScope.launch {
+                    taskViewModel.deleteTask(taskToDelete!!)
+                    tasks = refreshTasks(taskViewModel = taskViewModel)
+                    taskToDelete = null
                 }
             }
         )
@@ -328,6 +372,69 @@ fun ShowAddTaskDialog(
         }
     )
 
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun ShowDeleteConfirmationDialog(
+    onDismiss: () -> Unit,
+    onConfirmDelete: () -> Unit
+)
+{
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true
+        ),
+        content = {
+            Surface(
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = 8.dp,
+                modifier = Modifier
+                    .padding(24.dp)
+                    .fillMaxWidth()
+            )
+            {
+                Column(
+                    modifier = Modifier
+                        .padding(24.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        text = "Are you sure you want to delete this task?",
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .padding(bottom = 16.dp),
+                        color = MaterialTheme.colorScheme.onSurface
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.padding(end = 8.dp)
+                        ) {
+                            Text("Cancel")
+                        }
+
+                        Button(
+                            onClick = {
+                                onConfirmDelete()
+                            }
+                        ) {
+                            Text("Delete")
+                        }
+                    }
+                }
+            }
+        }
+    )
 }
 
 suspend fun refreshTasks(

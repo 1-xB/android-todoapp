@@ -1,6 +1,7 @@
 package com.example.todoapp.data
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 
@@ -14,4 +15,7 @@ interface TaskDao {
 
     @Query("UPDATE Tasks SET isCompleted = :isCompleted WHERE id = :taskId")
     suspend fun updateTaskCompletion(taskId: Int, isCompleted: Boolean)
+
+    @Delete
+    suspend fun deleteTask(task: Task)
 }
