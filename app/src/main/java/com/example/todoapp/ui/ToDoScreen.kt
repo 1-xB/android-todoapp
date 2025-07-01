@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -45,12 +47,11 @@ fun ToDoScreen(
     modifier: Modifier = Modifier,
     taskViewModel: TaskViewModel
 ) {
-    var tasks by remember { mutableStateOf<getTasks>(
+    var tasks by remember { mutableStateOf(
         getTasks()
     ) }
     val coroutineScope = rememberCoroutineScope()
 
-    var isExpandedPending by remember { mutableStateOf(true) }
     var isExpandedCompleted by remember { mutableStateOf(false) }
 
     var isAddTaskDialogOpen by remember { mutableStateOf(false) }
@@ -62,12 +63,16 @@ fun ToDoScreen(
     }
 
     Column(modifier = modifier) {
-        Button(
+        IconButton(
             onClick = {
                 isAddTaskDialogOpen = true
             }
         ) {
-            Text("Add Task")
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = "Add Task",
+                tint = MaterialTheme.colorScheme.primary
+            )
         }
 
 
@@ -83,65 +88,52 @@ fun ToDoScreen(
                 )
             }
 
-            item {
-                Button(
-                    onClick = { isExpandedPending = !isExpandedPending },
-                    modifier = Modifier.fillMaxWidth()
-                ) {
+            if (tasks.pendingTasks.isEmpty()) {
+                item {
                     Text(
-                        text = if (isExpandedPending) "Hide Pending Tasks ▲" else "Show Pending Tasks ▼"
+                        text = "No pending tasks",
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(16.dp),
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
             }
+            else {
+                items( tasks.pendingTasks) { task ->
 
-            if (isExpandedPending) {
-                if (tasks.pendingTasks.isEmpty()) {
-                    item {
-                        Text(
-                            text = "No pending tasks",
-                            style = MaterialTheme.typography.bodyMedium,
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        shape = MaterialTheme.shapes.medium,
+                        color = MaterialTheme.colorScheme.surface
+                    ) {
+                        Row(
                             modifier = Modifier.padding(16.dp),
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
-                else {
-                    items( tasks.pendingTasks) { task ->
-
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            shape = MaterialTheme.shapes.medium,
-                            color = MaterialTheme.colorScheme.surface
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Row(
-                                modifier = Modifier.padding(16.dp),
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Checkbox(
-                                    checked = task.isCompleted,
-                                    onCheckedChange = {
-                                        coroutineScope.launch {
-                                            taskViewModel.updateTaskCompletion(task.id, !task.isCompleted)
-                                            tasks = refreshTasks(taskViewModel = taskViewModel)
-                                        }
-                                    },
-                                    modifier = Modifier.padding(end = 8.dp),
-                                )
+                            Checkbox(
+                                checked = task.isCompleted,
+                                onCheckedChange = {
+                                    coroutineScope.launch {
+                                        taskViewModel.updateTaskCompletion(task.id, !task.isCompleted)
+                                        tasks = refreshTasks(taskViewModel = taskViewModel)
+                                    }
+                                },
+                                modifier = Modifier.padding(end = 8.dp),
+                            )
 
-                                Column {
-                                    Text(
-                                        text = task.title,
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurface
-                                    )
-                                    Text(
-                                        text = task.description ?: "No description",
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
+                            Column {
+                                Text(
+                                    text = task.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    color = MaterialTheme.colorScheme.onSurface
+                                )
+                                Text(
+                                    text = if (task.description.isNullOrBlank()) "No description" else task.description,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
                             }
                         }
                     }
@@ -149,23 +141,22 @@ fun ToDoScreen(
             }
 
 
-            item {
-                Text(
-                    text = "Completed Tasks",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(16.dp),
-                    color = MaterialTheme.colorScheme.onBackground
-                )
-            }
 
             item {
                 Button(
                     onClick = { isExpandedCompleted = !isExpandedCompleted },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = ButtonDefaults.buttonColors(
+                        MaterialTheme.colorScheme.surfaceVariant
+                    )
                 ) {
                     Text(
-                        text = if (isExpandedCompleted) "Hide Completed Tasks ▲" else "Show Completed Tasks ▼"
+                        text = if (isExpandedCompleted) "▲ Completed Tasks ${if (tasks.completedTasks.isNotEmpty()) tasks.completedTasks.size else ""}" else "▼ Completed Tasks ${if (tasks.completedTasks.isNotEmpty()) tasks.completedTasks.size else ""}",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onBackground
                     )
+
+
                 }
             }
 
@@ -214,7 +205,7 @@ fun ToDoScreen(
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                     Text(
-                                        text = task.description ?: "No description",
+                                        text = if (task.description.isNullOrBlank()) "No description" else task.description,
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             textDecoration = TextDecoration.LineThrough
                                         ),
@@ -443,7 +434,7 @@ suspend fun refreshTasks(
     val tasks = taskViewModel.getAllTasks()
 
     return getTasks(
-        completedTasks = tasks.filter { it.isCompleted == true },
-        pendingTasks = tasks.filter { it.isCompleted == false }
+        completedTasks = tasks.filter { it.isCompleted },
+        pendingTasks = tasks.filter { !it.isCompleted  }
     )
 }
