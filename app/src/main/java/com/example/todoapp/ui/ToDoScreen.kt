@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,7 +46,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun ToDoScreen(
     modifier: Modifier = Modifier,
-    taskViewModel: TaskViewModel
+    taskViewModel: TaskViewModel,
+    onNavigateToEditTask: (Int) -> Unit = {},
 ) {
     var tasks by remember { mutableStateOf(
         getTasks()
@@ -105,6 +107,9 @@ fun ToDoScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(8.dp),
+                        onClick = {
+                            onNavigateToEditTask(task.id)
+                        },
                         shape = MaterialTheme.shapes.medium,
                         color = MaterialTheme.colorScheme.surface
                     ) {
@@ -125,15 +130,22 @@ fun ToDoScreen(
 
                             Column {
                                 Text(
-                                    text = task.title,
+                                    text = if (task.title.length > 25) task.title.substring(0, 25) + "..." else task.title,
                                     style = MaterialTheme.typography.titleMedium,
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                                 Text(
-                                    text = if (task.description.isNullOrBlank()) "No description" else task.description,
+                                    text = if (task.description.isNullOrBlank()) "No description" else if (task.description.length > 25) task.description.substring(0, 25) + "..." else task.description,
                                     style = MaterialTheme.typography.bodyMedium,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
+                            }
+
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.End,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
                             }
                         }
                     }
@@ -178,6 +190,9 @@ fun ToDoScreen(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(8.dp),
+                            onClick = {
+                                onNavigateToEditTask(task.id)
+                            },
                             shape = MaterialTheme.shapes.medium,
                             color = MaterialTheme.colorScheme.surface
                         ) {
@@ -198,14 +213,14 @@ fun ToDoScreen(
 
                                 Column {
                                     Text(
-                                        text = task.title,
+                                        text = if (task.title.length > 25) task.title.substring(0, 25) + "..." else task.title,
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             textDecoration = TextDecoration.LineThrough
                                         ),
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                                     )
                                     Text(
-                                        text = if (task.description.isNullOrBlank()) "No description" else task.description,
+                                        text = if (task.description.isNullOrBlank()) "No description" else if (task.description.length > 25) task.description.substring(0, 25) + "..." else task.description,
                                         style = MaterialTheme.typography.bodyMedium.copy(
                                             textDecoration = TextDecoration.LineThrough
                                         ),
@@ -220,6 +235,18 @@ fun ToDoScreen(
                                     horizontalArrangement = Arrangement.End,
                                     modifier = Modifier.fillMaxWidth()
                                 ) {
+
+                                    IconButton(
+                                        onClick = {
+                                        }
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Edit,
+                                            contentDescription = "edit task",
+                                            tint = MaterialTheme.colorScheme.primary
+                                        )
+                                    }
+
                                     IconButton(
                                         onClick = {
                                             taskToDelete = task
@@ -265,7 +292,7 @@ fun ToDoScreen(
             },
             onConfirmDelete = {
                 coroutineScope.launch {
-                    taskViewModel.deleteTask(taskToDelete!!)
+                    taskViewModel.deleteTask(taskToDelete!!.id)
                     tasks = refreshTasks(taskViewModel = taskViewModel)
                     taskToDelete = null
                 }

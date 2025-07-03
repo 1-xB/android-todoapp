@@ -8,6 +8,8 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
 
     suspend fun getAllTasks() = repository.getAllTasks()
 
+    suspend fun getTaskById(taskId: Int) = repository.getTaskById(taskId)
+
     suspend fun addTask(task: Task) {
         repository.addTask(task)
     }
@@ -16,7 +18,11 @@ class TaskViewModel(private val repository: TaskRepository) : ViewModel() {
         repository.updateTaskCompletion(taskId, isCompleted)
     }
 
-    suspend fun deleteTask(task: Task) {
-        repository.deleteTask(task)
+    suspend fun deleteTask(taskId: Int) {
+        repository.deleteTask(taskId)
+    }
+
+    suspend fun updateTask(task: Task) {
+        repository.updateTask(task)
     }
 }

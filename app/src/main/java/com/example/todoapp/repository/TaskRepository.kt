@@ -18,6 +18,10 @@ class TaskRepository(context: Context) {
         return taskDao.getAllTasks()
     }
 
+    suspend fun getTaskById(taskId: Int): Task? {
+        return taskDao.getTaskById(taskId)
+    }
+
     suspend fun addTask(task: Task) {
         taskDao.insertTask(task)
     }
@@ -26,7 +30,11 @@ class TaskRepository(context: Context) {
         taskDao.updateTaskCompletion(taskId, isCompleted)
     }
 
-    suspend fun deleteTask(task: Task) {
-        taskDao.deleteTask(task)
+    suspend fun deleteTask(taskId: Int) {
+        taskDao.deleteTask(taskId)
+    }
+
+    suspend fun updateTask(task: Task) {
+        taskDao.updateTask(task)
     }
 }
