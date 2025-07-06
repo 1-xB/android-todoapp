@@ -238,6 +238,7 @@ fun ToDoScreen(
 
                                     IconButton(
                                         onClick = {
+                                            onNavigateToEditTask(task.id)
                                         }
                                     ) {
                                         Icon(
