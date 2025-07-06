@@ -17,10 +17,11 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+        val taskViewModel = TaskViewModel(
+            repository = TaskRepository(this@MainActivity)
+        )
         setContent {
-            val taskViewModel = TaskViewModel(
-                repository = TaskRepository(this@MainActivity)
-            )
+
             ToDoAppTheme {
                 Scaffold(modifier = Modifier.Companion.fillMaxSize()) { innerPadding ->
                     ToDoApp(

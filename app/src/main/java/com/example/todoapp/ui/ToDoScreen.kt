@@ -238,17 +238,6 @@ fun ToDoScreen(
 
                                     IconButton(
                                         onClick = {
-                                        }
-                                    ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Edit,
-                                            contentDescription = "edit task",
-                                            tint = MaterialTheme.colorScheme.primary
-                                        )
-                                    }
-
-                                    IconButton(
-                                        onClick = {
                                             taskToDelete = task
                                         }
                                     ) {

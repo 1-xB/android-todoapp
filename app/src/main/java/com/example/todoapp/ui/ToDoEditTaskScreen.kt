@@ -109,7 +109,7 @@ fun EditTaskContent(
             IconButton(onClick = onBack) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Wróć",
+                    contentDescription = "Back",
                     tint = MaterialTheme.colorScheme.primary
                 )
             }
@@ -125,7 +125,7 @@ fun EditTaskContent(
             ) {
                 Icon(
                     imageVector = Icons.Default.Delete,
-                    contentDescription = "Usuń zadanie",
+                    contentDescription = "Delete Task",
                     tint = MaterialTheme.colorScheme.error
                 )
             }

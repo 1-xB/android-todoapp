@@ -86,7 +86,11 @@ fun ToDoApp(
 
                     },
                     onError = { navController.popBackStack() },
-                    onBack = { navController.popBackStack() },
+                    onBack = {
+                        navController.navigate("task_list") {
+                            popUpTo("task_list")
+                        }
+                    },
                 )
             }
 

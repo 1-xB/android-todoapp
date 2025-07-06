@@ -10,7 +10,8 @@ class TaskRepository(context: Context) {
         context.applicationContext,
         AppDatabase::class.java,
         "todo_db"
-    ).build()
+    ).addMigrations(AppDatabase.MIGRATION_1_2).build()
+
 
     private val taskDao = db.taskDao()
 
