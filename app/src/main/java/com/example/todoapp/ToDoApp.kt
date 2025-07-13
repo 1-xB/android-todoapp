@@ -1,6 +1,8 @@
 package com.example.todoapp
 
 import android.annotation.SuppressLint
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -20,6 +22,7 @@ import com.example.todoapp.ui.ToDoScreen
 import com.example.todoapp.viewmodels.TaskViewModel
 import kotlinx.coroutines.launch
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("CoroutineCreationDuringComposition")
 @Composable
 fun ToDoApp(
@@ -63,14 +66,15 @@ fun ToDoApp(
             if (!isLoading) {
                 ToDoEditTaskScreen(
                     task = task,
-                    onTaskUpdated = { id, title, description, isCompleted ->
+                    onTaskUpdated = { id, title, description, isCompleted, notificationTime ->
                         coroutineScope.launch {
                             taskViewModel.updateTask(
                                 Task(
                                     id = id,
                                     title = title,
                                     description = description,
-                                    isCompleted = isCompleted
+                                    isCompleted = isCompleted,
+                                    notificationTime = notificationTime
                                 )
                             )
                             navController.popBackStack()
